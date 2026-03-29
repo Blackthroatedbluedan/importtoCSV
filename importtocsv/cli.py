@@ -34,11 +34,44 @@ def convert(
         "--ocr-lang",
         help="Tesseract language(s), e.g. eng or eng+deu",
     ),
+    pdf_ocr_min_chars: int = typer.Option(
+        80,
+        "--pdf-ocr-min-chars",
+        help="If a PDF page has fewer extracted characters, render and OCR the page (scanned PDFs)",
+        min=0,
+    ),
+    pdf_ocr_resolution: int = typer.Option(
+        200,
+        "--pdf-ocr-dpi",
+        help="Render resolution (DPI) for PDF page OCR when text extraction is thin",
+        min=72,
+        max=600,
+    ),
+    pdf_ocr_max_lines: int = typer.Option(
+        2,
+        "--pdf-ocr-max-lines",
+        help="OCR a page only if extractable text has at most this many non-empty lines (scanned PDF heuristic)",
+        min=0,
+        max=50,
+    ),
+    force_pdf_ocr: bool = typer.Option(
+        False,
+        "--force-pdf-ocr",
+        help="Always OCR every PDF page (ignore embedded text)",
+    ),
 ) -> None:
     """Detect file type and write a UTF-8 CSV of extracted content."""
     suf = _suffix(input_path)
     if suf == ".pdf":
-        rows = extract_pdf_rows(input_path, password=password)
+        rows = extract_pdf_rows(
+            input_path,
+            password=password,
+            ocr_lang=ocr_lang,
+            ocr_resolution=pdf_ocr_resolution,
+            ocr_min_chars=pdf_ocr_min_chars,
+            ocr_max_text_lines=pdf_ocr_max_lines,
+            force_pdf_ocr=force_pdf_ocr,
+        )
     elif suf in (".png", ".jpg", ".jpeg", ".tif", ".tiff", ".bmp", ".webp"):
         rows = extract_image_rows(input_path, lang=ocr_lang)
     elif suf in (".dxf", ".dwg"):
