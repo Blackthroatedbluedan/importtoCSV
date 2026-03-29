@@ -1,16 +1,15 @@
-"""FastAPI web UI: upload a file, download extracted CSV."""
+"""FastAPI web UI: upload a file, preview rows, download CSV."""
 
 from __future__ import annotations
 
-import tempfile
+import json
 from pathlib import Path
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
-from fastapi.responses import HTMLResponse, StreamingResponse
+from fastapi.responses import HTMLResponse, Response
 from fastapi.staticfiles import StaticFiles
 
-from importtocsv.convert_core import ConvertOptions, convert_path_to_rows_or_raise
-from importtocsv.csv_out import write_csv
+from importtocsv.web_convert import read_upload_and_extract
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 
@@ -43,64 +42,66 @@ async def api_convert(
     pdf_ocr_dpi: int = Form(200),
     pdf_ocr_max_lines: int = Form(2),
     force_pdf_ocr: bool = Form(False),
-) -> StreamingResponse:
-    if not file.filename:
-        raise HTTPException(400, "No filename")
-
-    suffix = Path(file.filename).suffix.lower()
-    if suffix not in {
-        ".pdf",
-        ".png",
-        ".jpg",
-        ".jpeg",
-        ".tif",
-        ".tiff",
-        ".bmp",
-        ".webp",
-        ".dxf",
-        ".dwg",
-    }:
-        raise HTTPException(400, f"Unsupported type {suffix!r}")
-
-    raw = await file.read()
-    if not raw:
-        raise HTTPException(400, "Empty file")
-
-    opts = ConvertOptions(
-        password=password or None,
-        ocr_lang=ocr_lang.strip() or "eng",
-        pdf_ocr_min_chars=max(0, pdf_ocr_min_chars),
-        pdf_ocr_resolution=max(72, min(600, pdf_ocr_dpi)),
-        pdf_ocr_max_lines=max(0, min(50, pdf_ocr_max_lines)),
-        force_pdf_ocr=force_pdf_ocr,
+) -> Response:
+    rows, csv_text, filename = await read_upload_and_extract(
+        file,
+        password,
+        ocr_lang,
+        pdf_ocr_min_chars,
+        pdf_ocr_dpi,
+        pdf_ocr_max_lines,
+        force_pdf_ocr,
     )
-
-    with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
-        tmp.write(raw)
-        tmp_path = Path(tmp.name)
-
-    try:
-        rows = convert_path_to_rows_or_raise(tmp_path, opts)
-    except ValueError as e:
-        raise HTTPException(422, str(e)) from e
-    finally:
-        tmp_path.unlink(missing_ok=True)
-
-    with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as out_tmp:
-        out_path = Path(out_tmp.name)
-    try:
-        write_csv(rows, out_path)
-        data = out_path.read_bytes()
-    finally:
-        out_path.unlink(missing_ok=True)
-    base = Path(file.filename).stem or "export"
+    base = Path(filename).stem or "export"
     out_name = f"{base}_extracted.csv"
+    data = csv_text.encode("utf-8")
 
-    return StreamingResponse(
-        iter([data]),
+    return Response(
+        content=data,
         media_type="text/csv; charset=utf-8",
         headers={
             "Content-Disposition": f'attachment; filename="{out_name}"',
+            "X-Row-Count": str(len(rows)),
+        },
+    )
+
+
+@app.post("/api/convert-preview")
+async def api_convert_preview(
+    file: UploadFile = File(...),
+    password: str | None = Form(None),
+    ocr_lang: str = Form("eng"),
+    pdf_ocr_min_chars: int = Form(80),
+    pdf_ocr_dpi: int = Form(200),
+    pdf_ocr_max_lines: int = Form(2),
+    force_pdf_ocr: bool = Form(False),
+    preview_limit: int = Form(80),
+) -> Response:
+    rows, csv_text, filename = await read_upload_and_extract(
+        file,
+        password,
+        ocr_lang,
+        pdf_ocr_min_chars,
+        pdf_ocr_dpi,
+        pdf_ocr_max_lines,
+        force_pdf_ocr,
+    )
+    lim = max(1, min(500, preview_limit))
+    preview_rows = rows[:lim]
+    payload = {
+        "filename": filename,
+        "row_count": len(rows),
+        "preview_limit": lim,
+        "preview_truncated": len(rows) > lim,
+        "columns": sorted({k for r in preview_rows for k in r.keys()}) if preview_rows else [],
+        "rows": preview_rows,
+        "csv": csv_text,
+    }
+    body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+    return Response(
+        content=body,
+        media_type="application/json; charset=utf-8",
+        headers={
             "X-Row-Count": str(len(rows)),
         },
     )

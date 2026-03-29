@@ -35,13 +35,17 @@ importtocsv-serve
 # or: python -m uvicorn importtocsv.web_app:app --host 127.0.0.1 --port 8000
 ```
 
-Open [http://127.0.0.1:8000](http://127.0.0.1:8000), choose a file, click **Extract to CSV**. The browser downloads `{name}_extracted.csv`.
+Open [http://127.0.0.1:8000](http://127.0.0.1:8000), choose a file, click **Extract & preview**. The page shows the **first 80 rows** in a scrollable table (with row count) so you can confirm the extract, then use **Download CSV** for the full file. Raw download-only: `POST /api/convert` (same as before).
 
-To **record a short demo video** (Playwright + local server; needs `pip install -e ".[dev]"` and `playwright install chromium`; MP4 needs `ffmpeg`):
+To **record demo videos** (Playwright + local server; needs `pip install -e ".[dev]"` and `playwright install chromium`; MP4 needs `ffmpeg`):
 
 ```bash
 PYTHONPATH=. python3 scripts/record_ui_demo.py
 # writes artifacts/importtocsv_ui_demo.webm and .mp4 (gitignored)
+
+# Preview UI with three PDFs (paths fixed for this repo’s Cursor uploads layout):
+PYTHONPATH=. python3 scripts/record_three_pdfs_demo.py
+# writes artifacts/importtocsv_three_files_demo.mp4
 ```
 
 ## CLI usage

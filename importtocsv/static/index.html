@@ -50,10 +50,27 @@
         </label>
       </details>
 
-      <button type="submit" class="btn" id="submit">Extract to CSV</button>
+      <button type="submit" class="btn" id="submit">Extract &amp; preview</button>
     </form>
 
     <p id="status" class="status" role="status" aria-live="polite"></p>
+
+    <section id="preview-section" class="preview-section hidden" aria-label="Extraction preview">
+      <div class="preview-head">
+        <h2>Preview</h2>
+        <p id="preview-meta" class="preview-meta"></p>
+        <div class="preview-actions">
+          <button type="button" class="btn secondary" id="btn-download">Download CSV</button>
+        </div>
+      </div>
+      <div class="table-wrap" id="table-wrap">
+        <table class="data-table" id="preview-table">
+          <thead id="preview-thead"></thead>
+          <tbody id="preview-tbody"></tbody>
+        </table>
+      </div>
+      <p id="preview-trunc" class="preview-trunc hidden"></p>
+    </section>
   </main>
   <script src="/static/app.js"></script>
 </body>
