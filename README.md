@@ -1,6 +1,6 @@
 # importtoCSV
 
-CLI to turn **equipment manuals and drawings** into **UTF-8 CSV** rows you can feed to an LLM or spreadsheet tools.
+Turn **equipment manuals and drawings** into **UTF-8 CSV** rows for LLMs or spreadsheets — via **CLI** or a small **web UI**.
 
 ## Supported inputs
 
@@ -27,7 +27,24 @@ System dependency for images:
 sudo apt install tesseract-ocr
 ```
 
-## Usage
+## Web UI
+
+```bash
+pip install -e .
+importtocsv-serve
+# or: python -m uvicorn importtocsv.web_app:app --host 127.0.0.1 --port 8000
+```
+
+Open [http://127.0.0.1:8000](http://127.0.0.1:8000), choose a file, click **Extract to CSV**. The browser downloads `{name}_extracted.csv`.
+
+To **record a short demo video** (Playwright + local server; needs `pip install -e ".[dev]"` and `playwright install chromium`; MP4 needs `ffmpeg`):
+
+```bash
+PYTHONPATH=. python3 scripts/record_ui_demo.py
+# writes artifacts/importtocsv_ui_demo.webm and .mp4 (gitignored)
+```
+
+## CLI usage
 
 ```bash
 python -m importtocsv manual.pdf out.csv

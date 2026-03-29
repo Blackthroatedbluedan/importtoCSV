@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>importtoCSV</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <main class="wrap">
+    <header class="head">
+      <h1>importtoCSV</h1>
+      <p class="sub">Upload a PDF, image, DXF, or DWG and download extracted rows as CSV for spreadsheets or LLMs.</p>
+    </header>
+
+    <form id="form" class="card">
+      <label class="field">
+        <span class="label">File</span>
+        <input type="file" name="file" id="file" required
+          accept=".pdf,.png,.jpg,.jpeg,.tif,.tiff,.bmp,.webp,.dxf,.dwg" />
+      </label>
+
+      <details class="advanced">
+        <summary>Options</summary>
+        <label class="field">
+          <span class="label">PDF password (optional)</span>
+          <input type="password" name="password" id="password" autocomplete="off" placeholder="Leave empty if not encrypted" />
+        </label>
+        <label class="field">
+          <span class="label">OCR language(s)</span>
+          <input type="text" name="ocr_lang" id="ocr_lang" value="eng" placeholder="eng, eng+fra, …" />
+        </label>
+        <div class="row2">
+          <label class="field tight">
+            <span class="label">PDF OCR min chars</span>
+            <input type="number" name="pdf_ocr_min_chars" id="pdf_ocr_min_chars" value="80" min="0" />
+          </label>
+          <label class="field tight">
+            <span class="label">PDF OCR max lines</span>
+            <input type="number" name="pdf_ocr_max_lines" id="pdf_ocr_max_lines" value="2" min="0" max="50" />
+          </label>
+        </div>
+        <label class="field">
+          <span class="label">PDF OCR DPI</span>
+          <input type="number" name="pdf_ocr_dpi" id="pdf_ocr_dpi" value="200" min="72" max="600" />
+        </label>
+        <label class="check">
+          <input type="checkbox" name="force_pdf_ocr" id="force_pdf_ocr" value="true" />
+          <span>Force OCR on every PDF page</span>
+        </label>
+      </details>
+
+      <button type="submit" class="btn" id="submit">Extract to CSV</button>
+    </form>
+
+    <p id="status" class="status" role="status" aria-live="polite"></p>
+  </main>
+  <script src="/static/app.js"></script>
+</body>
+</html>

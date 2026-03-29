@@ -9,3 +9,4 @@ venv/
 .env
 *.csv
 !tests/fixtures/*.csv
+artifacts/

@@ -4,13 +4,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import ezdxf
 import typer
 
-from importtocsv.cad_extract import extract_cad_rows
+from importtocsv.convert_core import ConvertOptions, convert_path_to_rows_or_raise
 from importtocsv.csv_out import write_csv
-from importtocsv.image_ocr import extract_image_rows
-from importtocsv.pdf_extract import extract_pdf_rows
 
 app = typer.Typer(no_args_is_help=True, help="Convert manuals and drawings to CSV for LLMs.")
 
@@ -37,7 +34,7 @@ def convert(
     pdf_ocr_min_chars: int = typer.Option(
         80,
         "--pdf-ocr-min-chars",
-        help="If a PDF page has fewer extracted characters, render and OCR the page (scanned PDFs)",
+        help="If a PDF page has fewer extracted characters, consider it for OCR (with images)",
         min=0,
     ),
     pdf_ocr_resolution: int = typer.Option(
@@ -62,30 +59,37 @@ def convert(
 ) -> None:
     """Detect file type and write a UTF-8 CSV of extracted content."""
     suf = _suffix(input_path)
-    if suf == ".pdf":
-        rows = extract_pdf_rows(
-            input_path,
-            password=password,
-            ocr_lang=ocr_lang,
-            ocr_resolution=pdf_ocr_resolution,
-            ocr_min_chars=pdf_ocr_min_chars,
-            ocr_max_text_lines=pdf_ocr_max_lines,
-            force_pdf_ocr=force_pdf_ocr,
-        )
-    elif suf in (".png", ".jpg", ".jpeg", ".tif", ".tiff", ".bmp", ".webp"):
-        rows = extract_image_rows(input_path, lang=ocr_lang)
-    elif suf in (".dxf", ".dwg"):
-        try:
-            rows = extract_cad_rows(input_path)
-        except ezdxf.DXFStructureError as e:
-            typer.echo(f"CAD read failed (try converting DWG to DXF in CAD software): {e}", err=True)
-            raise typer.Exit(1) from e
-    else:
+    if suf not in {
+        ".pdf",
+        ".png",
+        ".jpg",
+        ".jpeg",
+        ".tif",
+        ".tiff",
+        ".bmp",
+        ".webp",
+        ".dxf",
+        ".dwg",
+    }:
         typer.echo(
             f"Unsupported extension {suf!r}. Use .pdf, image formats, .dxf, or .dwg.",
             err=True,
         )
         raise typer.Exit(1)
+
+    opts = ConvertOptions(
+        password=password,
+        ocr_lang=ocr_lang,
+        pdf_ocr_min_chars=pdf_ocr_min_chars,
+        pdf_ocr_resolution=pdf_ocr_resolution,
+        pdf_ocr_max_lines=pdf_ocr_max_lines,
+        force_pdf_ocr=force_pdf_ocr,
+    )
+    try:
+        rows = convert_path_to_rows_or_raise(input_path, opts)
+    except ValueError as e:
+        typer.echo(str(e), err=True)
+        raise typer.Exit(1) from e
 
     write_csv(rows, output_csv)
     typer.echo(f"Wrote {len(rows)} row(s) to {output_csv}")
