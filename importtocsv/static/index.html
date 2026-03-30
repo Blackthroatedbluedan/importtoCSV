@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>importtoCSV</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <main class="wrap">
+    <nav class="top-nav">
+      <a href="/" aria-current="page">Extract</a>
+      <span class="nav-sep">·</span>
+      <a href="/viewer">View CSV in browser</a>
+    </nav>
+
+    <header class="head">
+      <h1>importtoCSV</h1>
+      <p class="sub">Upload a PDF, image, DXF, or DWG and download extracted rows as CSV for spreadsheets or LLMs.</p>
+    </header>
+
+    <form id="form" class="card">
+      <label class="field">
+        <span class="label">File</span>
+        <input type="file" name="file" id="file" required
+          accept=".pdf,.png,.jpg,.jpeg,.tif,.tiff,.bmp,.webp,.dxf,.dwg" />
+      </label>
+
+      <details class="advanced">
+        <summary>Options</summary>
+        <label class="field">
+          <span class="label">PDF password (optional)</span>
+          <input type="password" name="password" id="password" autocomplete="off" placeholder="Leave empty if not encrypted" />
+        </label>
+        <label class="field">
+          <span class="label">OCR language(s)</span>
+          <input type="text" name="ocr_lang" id="ocr_lang" value="eng" placeholder="eng, eng+fra, …" />
+        </label>
+        <div class="row2">
+          <label class="field tight">
+            <span class="label">PDF OCR min chars</span>
+            <input type="number" name="pdf_ocr_min_chars" id="pdf_ocr_min_chars" value="80" min="0" />
+          </label>
+          <label class="field tight">
+            <span class="label">PDF OCR max lines</span>
+            <input type="number" name="pdf_ocr_max_lines" id="pdf_ocr_max_lines" value="2" min="0" max="50" />
+          </label>
+        </div>
+        <label class="field">
+          <span class="label">PDF OCR DPI</span>
+          <input type="number" name="pdf_ocr_dpi" id="pdf_ocr_dpi" value="200" min="72" max="600" />
+        </label>
+        <label class="check">
+          <input type="checkbox" name="force_pdf_ocr" id="force_pdf_ocr" value="true" />
+          <span>Force OCR on every PDF page</span>
+        </label>
+      </details>
+
+      <button type="submit" class="btn" id="submit">Extract &amp; preview</button>
+    </form>
+
+    <p id="status" class="status" role="status" aria-live="polite"></p>
+
+    <section id="preview-section" class="preview-section hidden" aria-label="Extraction preview">
+      <div class="preview-head">
+        <h2>Extracted data</h2>
+        <p id="preview-meta" class="preview-meta"></p>
+        <div class="preview-actions">
+          <button type="button" class="btn secondary" id="btn-download">Download CSV</button>
+        </div>
+      </div>
+      <div class="table-toolbar">
+        <label class="field toolbar-search">
+          <span class="label">Search in table</span>
+          <input type="search" id="table-search" placeholder="Filter rows (e.g. EVEREST, 10M, footing)…" autocomplete="off" />
+        </label>
+        <label class="field toolbar-col">
+          <span class="label">Column</span>
+          <select id="table-search-column"></select>
+        </label>
+        <label class="check toolbar-case">
+          <input type="checkbox" id="table-search-case" />
+          <span>Case sensitive</span>
+        </label>
+        <p id="table-filter-count" class="filter-count" aria-live="polite"></p>
+      </div>
+      <div class="table-wrap" id="table-wrap">
+        <table class="data-table" id="preview-table">
+          <thead id="preview-thead"></thead>
+          <tbody id="preview-tbody"></tbody>
+        </table>
+      </div>
+      <p id="preview-trunc" class="preview-trunc hidden"></p>
+    </section>
+  </main>
+  <script src="/static/table.js"></script>
+  <script src="/static/app.js"></script>
+</body>
+</html>

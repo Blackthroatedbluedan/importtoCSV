@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CSV viewer — importtoCSV</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <main class="wrap">
+    <nav class="top-nav">
+      <a href="/">Extract</a>
+      <span class="nav-sep">·</span>
+      <a href="/viewer" aria-current="page">View CSV in browser</a>
+    </nav>
+
+    <header class="head">
+      <h1>View CSV results</h1>
+      <p class="sub">Open an <code>_extracted.csv</code> file from your computer (no upload — everything stays in the browser). Drag and drop or choose a file.</p>
+    </header>
+
+    <div class="card viewer-card">
+      <div id="drop-zone" class="drop-zone" tabindex="0">
+        <p class="drop-zone-title">Drop CSV here or <label class="file-link"><input type="file" id="csv-file" accept=".csv,text/csv" hidden />choose file</label></p>
+        <p id="viewer-file-name" class="viewer-file-name"></p>
+      </div>
+      <p id="viewer-error" class="status err hidden" role="alert"></p>
+    </div>
+
+    <section id="preview-section" class="preview-section hidden" aria-label="CSV table">
+      <div class="preview-head">
+        <h2>Table</h2>
+        <p id="preview-meta" class="preview-meta"></p>
+      </div>
+      <div class="table-toolbar">
+        <label class="field toolbar-search">
+          <span class="label">Search</span>
+          <input type="search" id="table-search" placeholder="Filter rows…" autocomplete="off" />
+        </label>
+        <label class="field toolbar-col">
+          <span class="label">Column</span>
+          <select id="table-search-column"></select>
+        </label>
+        <label class="check toolbar-case">
+          <input type="checkbox" id="table-search-case" />
+          <span>Case sensitive</span>
+        </label>
+        <p id="table-filter-count" class="filter-count" aria-live="polite"></p>
+      </div>
+      <div class="table-wrap" id="table-wrap">
+        <table class="data-table" id="preview-table">
+          <thead id="preview-thead"></thead>
+          <tbody id="preview-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+  <script src="/static/csv_parse.js"></script>
+  <script src="/static/table.js"></script>
+  <script src="/static/viewer.js"></script>
+</body>
+</html>
