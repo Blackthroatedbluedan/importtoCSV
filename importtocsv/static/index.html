@@ -57,11 +57,26 @@
 
     <section id="preview-section" class="preview-section hidden" aria-label="Extraction preview">
       <div class="preview-head">
-        <h2>Preview</h2>
+        <h2>Extracted data</h2>
         <p id="preview-meta" class="preview-meta"></p>
         <div class="preview-actions">
           <button type="button" class="btn secondary" id="btn-download">Download CSV</button>
         </div>
+      </div>
+      <div class="table-toolbar">
+        <label class="field toolbar-search">
+          <span class="label">Search in table</span>
+          <input type="search" id="table-search" placeholder="Filter rows (e.g. EVEREST, 10M, footing)…" autocomplete="off" />
+        </label>
+        <label class="field toolbar-col">
+          <span class="label">Column</span>
+          <select id="table-search-column"></select>
+        </label>
+        <label class="check toolbar-case">
+          <input type="checkbox" id="table-search-case" />
+          <span>Case sensitive</span>
+        </label>
+        <p id="table-filter-count" class="filter-count" aria-live="polite"></p>
       </div>
       <div class="table-wrap" id="table-wrap">
         <table class="data-table" id="preview-table">
@@ -72,6 +87,7 @@
       <p id="preview-trunc" class="preview-trunc hidden"></p>
     </section>
   </main>
+  <script src="/static/table.js"></script>
   <script src="/static/app.js"></script>
 </body>
 </html>

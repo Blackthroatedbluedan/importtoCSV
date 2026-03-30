@@ -86,14 +86,15 @@ async def api_convert_preview(
         pdf_ocr_max_lines,
         force_pdf_ocr,
     )
-    lim = max(1, min(500, preview_limit))
+    lim = max(1, min(50_000, preview_limit))
     preview_rows = rows[:lim]
+    all_cols = sorted({k for r in rows for k in r.keys()}) if rows else []
     payload = {
         "filename": filename,
         "row_count": len(rows),
         "preview_limit": lim,
         "preview_truncated": len(rows) > lim,
-        "columns": sorted({k for r in preview_rows for k in r.keys()}) if preview_rows else [],
+        "columns": all_cols,
         "rows": preview_rows,
         "csv": csv_text,
     }

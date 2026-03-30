@@ -4,34 +4,10 @@
   const submit = document.getElementById("submit");
   const previewSection = document.getElementById("preview-section");
   const previewMeta = document.getElementById("preview-meta");
-  const previewThead = document.getElementById("preview-thead");
-  const previewTbody = document.getElementById("preview-tbody");
   const previewTrunc = document.getElementById("preview-trunc");
   const btnDownload = document.getElementById("btn-download");
 
   let lastDownload = { name: "", blob: null };
-
-  function buildTable(columns, rows) {
-    previewThead.innerHTML = "";
-    previewTbody.innerHTML = "";
-    const hr = document.createElement("tr");
-    columns.forEach((col) => {
-      const th = document.createElement("th");
-      th.textContent = col;
-      hr.appendChild(th);
-    });
-    previewThead.appendChild(hr);
-    rows.forEach((row) => {
-      const tr = document.createElement("tr");
-      columns.forEach((col) => {
-        const td = document.createElement("td");
-        const v = row[col];
-        td.textContent = v == null ? "" : String(v);
-        tr.appendChild(td);
-      });
-      previewTbody.appendChild(tr);
-    });
-  }
 
   btnDownload.addEventListener("click", () => {
     if (!lastDownload.blob) return;
@@ -61,7 +37,7 @@
       return;
     }
     fd.set("file", file);
-    fd.append("preview_limit", "80");
+    fd.set("preview_limit", "50000");
 
     if (!fd.get("force_pdf_ocr")) {
       fd.delete("force_pdf_ocr");
@@ -78,13 +54,19 @@
       }
       const data = await res.json();
       const count = data.row_count;
-      const cols = data.columns.length ? data.columns : ["content", "kind", "page", "source"];
-      buildTable(cols, data.rows || []);
+      const cols = data.columns.length
+        ? data.columns
+        : ["content", "kind", "page", "source"];
+      const tableRows = data.rows || [];
 
-      previewMeta.textContent = `${data.filename} — ${count} row(s) total, showing first ${data.rows.length} in the table.`;
+      if (typeof window.__importtocsvSetTableData === "function") {
+        window.__importtocsvSetTableData(cols, tableRows);
+      }
+
+      previewMeta.textContent = `${data.filename} — ${count} row(s). Table shows ${tableRows.length} row(s).`;
       if (data.preview_truncated) {
         previewTrunc.textContent =
-          "Table shows a preview only. Download CSV for the full extract.";
+          `Only the first ${tableRows.length} rows are loaded in the browser for performance. The CSV download contains all ${count} row(s).`;
         previewTrunc.classList.remove("hidden");
       } else {
         previewTrunc.textContent = "";
@@ -99,7 +81,7 @@
       };
 
       previewSection.classList.remove("hidden");
-      status.textContent = `Done — ${count} row(s). Preview below; use Download CSV for the full file.`;
+      status.textContent = `Done — ${count} row(s). Search the table below or download CSV.`;
       status.classList.add("ok");
     } catch (err) {
       status.textContent = err.message || String(err);

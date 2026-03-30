@@ -35,7 +35,7 @@ importtocsv-serve
 # or: python -m uvicorn importtocsv.web_app:app --host 127.0.0.1 --port 8000
 ```
 
-Open [http://127.0.0.1:8000](http://127.0.0.1:8000), choose a file, click **Extract & preview**. The page shows the **first 80 rows** in a scrollable table (with row count) so you can confirm the extract, then use **Download CSV** for the full file. Raw download-only: `POST /api/convert` (same as before).
+Open [http://127.0.0.1:8000](http://127.0.0.1:8000), choose a file, click **Extract & preview**. The page loads **all rows** into a wide, zebra-striped table (up to 50k rows per request), with **Search in table** to filter by substring (all columns or one column). **Download CSV** is the full extract. Raw download-only: `POST /api/convert`. JSON with optional large table: `POST /api/convert-preview` (`preview_limit` default 50,000).
 
 To **record demo videos** (Playwright + local server; needs `pip install -e ".[dev]"` and `playwright install chromium`; MP4 needs `ffmpeg`):
 
@@ -50,12 +50,22 @@ PYTHONPATH=. python3 scripts/record_three_pdfs_demo.py
 
 ## CLI usage
 
+Typer registers subcommands; use **`convert`** for extraction:
+
 ```bash
-python -m importtocsv manual.pdf out.csv
-python -m importtocsv scan.png out.csv --ocr-lang eng
-python -m importtocsv brochure_scan.pdf out.csv --ocr-lang eng+fra --pdf-ocr-dpi 300
-python -m importtocsv secret.pdf out.csv --password 'your-password'
-python -m importtocsv drawing.dxf drawing.csv
+python -m importtocsv convert manual.pdf out.csv
+python -m importtocsv convert scan.png out.csv --ocr-lang eng
+python -m importtocsv convert brochure_scan.pdf out.csv --ocr-lang eng+fra --pdf-ocr-dpi 300
+python -m importtocsv convert secret.pdf out.csv --password 'your-password'
+python -m importtocsv convert drawing.dxf drawing.csv
+```
+
+### Search a CSV (verify parsed text)
+
+```bash
+python -m importtocsv search out.csv "EVEREST"
+python -m importtocsv search out.csv "10M" --column content
+python -m importtocsv search out.csv "footing" -o matches.csv
 ```
 
 ## Output columns

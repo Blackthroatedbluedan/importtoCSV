@@ -8,6 +8,7 @@ import typer
 
 from importtocsv.convert_core import ConvertOptions, convert_path_to_rows_or_raise
 from importtocsv.csv_out import write_csv
+from importtocsv.csv_search import search_csv_file, write_csv_subset
 
 app = typer.Typer(no_args_is_help=True, help="Convert manuals and drawings to CSV for LLMs.")
 
@@ -93,3 +94,43 @@ def convert(
 
     write_csv(rows, output_csv)
     typer.echo(f"Wrote {len(rows)} row(s) to {output_csv}")
+
+
+@app.command("search")
+def search_csv(
+    csv_path: Path = typer.Argument(..., exists=True, readable=True, help="CSV file produced by importtocsv"),
+    query: str = typer.Argument(..., help="Substring to find in any cell (or use --column to limit)"),
+    column: str | None = typer.Option(
+        None,
+        "--column",
+        "-c",
+        help="Only search this column name (must match CSV header)",
+    ),
+    case_sensitive: bool = typer.Option(False, "--case-sensitive", help="Match case"),
+    out: Path | None = typer.Option(
+        None,
+        "--out",
+        "-o",
+        help="Write matching rows to this CSV (optional)",
+    ),
+    limit: int = typer.Option(50, "--limit", "-n", min=0, help="Max rows to print (0 = no limit)"),
+) -> None:
+    """Print CSV rows that contain QUERY in any cell (or in --column). Use to verify extracted data."""
+    fieldnames, matched = search_csv_file(
+        csv_path, query, column=column, case_sensitive=case_sensitive
+    )
+    typer.echo(f"Matches: {len(matched)} row(s) in {csv_path}")
+    if not fieldnames:
+        typer.echo("(No header row found.)", err=True)
+        raise typer.Exit(1)
+    if out is not None:
+        out.parent.mkdir(parents=True, exist_ok=True)
+        with out.open("w", newline="", encoding="utf-8") as f:
+            write_csv_subset(fieldnames, matched, f)
+        typer.echo(f"Wrote {len(matched)} row(s) to {out}")
+    show = matched if limit == 0 else matched[:limit]
+    for i, row in enumerate(show, start=1):
+        parts = [f"{k}={row.get(k, '')!r}" for k in fieldnames if row.get(k)]
+        typer.echo(f"  {i}. " + " | ".join(parts))
+    if limit and len(matched) > limit:
+        typer.echo(f"  … {len(matched) - limit} more (use --limit 0 to print all)")

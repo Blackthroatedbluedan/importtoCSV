@@ -23,7 +23,7 @@ body {
 }
 
 .wrap {
-  max-width: 520px;
+  max-width: min(1120px, 100%);
   margin: 0 auto;
   padding: 2.5rem 1.25rem 3rem;
 }
@@ -42,6 +42,7 @@ body {
 }
 
 .card {
+  max-width: 520px;
   margin-top: 1.75rem;
   padding: 1.5rem;
   background: var(--card);
@@ -64,6 +65,16 @@ body {
   color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.04em;
+}
+
+input[type="search"],
+select {
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.95rem;
 }
 
 input[type="file"],
@@ -213,43 +224,92 @@ input:focus {
   filter: none;
 }
 
+.table-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.toolbar-search {
+  flex: 1 1 220px;
+  min-width: 180px;
+}
+
+.toolbar-col {
+  flex: 0 0 auto;
+  min-width: 9rem;
+}
+
+.toolbar-case {
+  flex: 0 0 auto;
+  margin-bottom: 0.15rem;
+}
+
+.filter-count {
+  margin: 0;
+  flex: 1 1 100%;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+@media (min-width: 640px) {
+  .filter-count {
+    flex: 0 0 auto;
+    margin-left: auto;
+    text-align: right;
+  }
+}
+
 .table-wrap {
-  max-height: min(50vh, 420px);
+  max-height: min(62vh, 560px);
   overflow: auto;
   border: 1px solid var(--border);
   border-radius: 8px;
+  background: #121a24;
 }
 
 .data-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.8rem;
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
 }
 
 .data-table th,
 .data-table td {
-  padding: 0.45rem 0.6rem;
+  padding: 0.5rem 0.75rem;
   text-align: left;
   border-bottom: 1px solid var(--border);
   vertical-align: top;
-  max-width: 28rem;
+  max-width: min(36rem, 40vw);
   word-break: break-word;
 }
 
 .data-table th {
   position: sticky;
   top: 0;
-  background: #243044;
-  color: var(--muted);
+  background: #1c2838;
+  color: #c5d0e0;
   font-weight: 600;
   text-transform: uppercase;
-  font-size: 0.68rem;
-  letter-spacing: 0.04em;
+  font-size: 0.65rem;
+  letter-spacing: 0.05em;
   z-index: 1;
+  box-shadow: 0 1px 0 var(--border);
+}
+
+.data-table tbody tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .data-table tbody tr:hover td {
-  background: rgba(61, 139, 253, 0.08);
+  background: rgba(61, 139, 253, 0.12);
 }
 
 .preview-trunc {
