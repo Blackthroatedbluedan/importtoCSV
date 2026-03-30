@@ -13,6 +13,83 @@
   box-sizing: border-box;
 }
 
+.top-nav {
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.top-nav a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.top-nav a:hover {
+  text-decoration: underline;
+}
+
+.top-nav a[aria-current="page"] {
+  color: var(--text);
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.nav-sep {
+  color: var(--muted);
+  margin: 0 0.35rem;
+}
+
+.sub code {
+  font-size: 0.88em;
+  padding: 0.1em 0.35em;
+  background: var(--bg);
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+
+.viewer-card {
+  max-width: min(1120px, 100%);
+}
+
+.drop-zone {
+  padding: 2rem 1.25rem;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.drop-zone:hover,
+.drop-zone:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: rgba(61, 139, 253, 0.06);
+}
+
+.drop-zone-active {
+  border-color: var(--accent);
+  background: rgba(61, 139, 253, 0.1);
+}
+
+.drop-zone-title {
+  margin: 0;
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.file-link {
+  color: var(--accent);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.viewer-file-name {
+  margin: 0.75rem 0 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+  word-break: break-all;
+}
+
 body {
   margin: 0;
   min-height: 100vh;

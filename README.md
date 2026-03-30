@@ -35,7 +35,9 @@ importtocsv-serve
 # or: python -m uvicorn importtocsv.web_app:app --host 127.0.0.1 --port 8000
 ```
 
-Open [http://127.0.0.1:8000](http://127.0.0.1:8000), choose a file, click **Extract & preview**. The page loads **all rows** into a wide, zebra-striped table (up to 50k rows per request), with **Search in table** to filter by substring (all columns or one column). **Download CSV** is the full extract. Raw download-only: `POST /api/convert`. JSON with optional large table: `POST /api/convert-preview` (`preview_limit` default 50,000).
+Open [http://127.0.0.1:8000](http://127.0.0.1:8000), choose a file, click **Extract & preview**.
+
+**View a saved CSV in the browser** (no server upload — parsing happens locally in your browser): open [http://127.0.0.1:8000/viewer](http://127.0.0.1:8000/viewer), then drag in or choose your `*_extracted.csv`. Same search and table styling as the extract page. The page loads **all rows** into a wide, zebra-striped table (up to 50k rows per request), with **Search in table** to filter by substring (all columns or one column). **Download CSV** is the full extract. Raw download-only: `POST /api/convert`. JSON with optional large table: `POST /api/convert-preview` (`preview_limit` default 50,000).
 
 To **record demo videos** (Playwright + local server; needs `pip install -e ".[dev]"` and `playwright install chromium`; MP4 needs `ffmpeg`):
 

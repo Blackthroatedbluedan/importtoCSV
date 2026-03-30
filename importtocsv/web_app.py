@@ -33,6 +33,14 @@ def index() -> str:
     return "<p>Missing static/index.html</p>"
 
 
+@app.get("/viewer", response_class=HTMLResponse)
+def viewer() -> str:
+    html_path = STATIC_DIR / "viewer.html"
+    if html_path.is_file():
+        return html_path.read_text(encoding="utf-8")
+    return "<p>Missing static/viewer.html</p>"
+
+
 @app.post("/api/convert")
 async def api_convert(
     file: UploadFile = File(...),
